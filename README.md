@@ -84,14 +84,32 @@ pip install -r requirements.txt
 
 ### Running the Scheduler
 
+**Option 1: Direct JSON string**
 ```bash
 python tdma_scheduler.py --coordinates '{"Node_01":[0.0,0.0],"Node_02":[300.0,0.0],...}' --range 500.0
+```
+
+**Option 2: From JSON file**
+```bash
+python run_from_file.py sample_input.json --range 500.0
 ```
 
 ### Parameters
 
 - `--coordinates`: JSON string with node coordinates (required)
 - `--range`: Radio range in meters (default: 500.0)
+
+### Verification
+
+Run the comprehensive test suite to verify correctness:
+
+```bash
+python validation_tests.py
+```
+
+Expected output: All 8 tests pass (100% success rate)
+
+See <ref_file file="C:\Users\Ekaa\OneDrive\Desktop\TDMA\VERIFICATION.md" /> for detailed verification methods.
 
 ### Input Format
 
