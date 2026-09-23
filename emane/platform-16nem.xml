@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE platform SYSTEM "file:///usr/local/share/emane/dtd/platform.dtd">
+
+<platform name="TDMA 16 Node Test Platform">
+
+  <param name="controlportendpoint" value="0.0.0.0:47000"/>
+
+  <param name="eventservicegroup" value="224.1.2.8:45703"/>
+  <param name="eventservicedevice" value="eth0"/>
+
+  <param name="otamanagergroup" value="224.1.2.9:45702"/>
+  <param name="otamanagerdevice" value="eth0"/>
+
+  <nem id="1" definition="tdmanem-1.xml"/>
+<nem id="2" definition="tdmanem-2.xml"/>
+<nem id="3" definition="tdmanem-3.xml"/>
+<nem id="4" definition="tdmanem-4.xml"/>
+<nem id="5" definition="tdmanem-5.xml"/>
+<nem id="6" definition="tdmanem-6.xml"/>
+<nem id="7" definition="tdmanem-7.xml"/>
+<nem id="8" definition="tdmanem-8.xml"/>
+<nem id="9" definition="tdmanem-9.xml"/>
+<nem id="10" definition="tdmanem-10.xml"/>
+<nem id="11" definition="tdmanem-11.xml"/>
+<nem id="12" definition="tdmanem-12.xml"/>
+<nem id="13" definition="tdmanem-13.xml"/>
+<nem id="14" definition="tdmanem-14.xml"/>
+<nem id="15" definition="tdmanem-15.xml"/>
+<nem id="16" definition="tdmanem-16.xml"/>
+
+</platform>
