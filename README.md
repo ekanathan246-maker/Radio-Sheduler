@@ -2,9 +2,33 @@
 
 A Python-based TDMA scheduler for wireless radio networks. The project converts radio coordinates into a communication graph, derives **distance-2 interference constraints**, assigns conflict-free transmission slots, and exports the resulting schedule for **EMANE** emulation.
 
-<p align="center">
-  <img src="tdma-architecture.svg" alt="TDMA System Architecture" width="100%">
-</p>
+## TDMA System Architecture
+
+```mermaid
+flowchart LR
+    A["Node Coordinates<br/>16 Radios • 4×4 Grid<br/>300 m Spacing"] --> B["Communication Graph<br/>500 m Radio Range"]
+    B --> C["Distance-2 Conflict Graph<br/>1-Hop + Common-Neighbor Conflicts"]
+    C --> D["Graph Coloring<br/>DSATUR / Heuristic Assignment"]
+    D --> E["Spatial Reuse<br/>Slot Compaction"]
+    E --> F["TDMA Schedule<br/>9 Slots"]
+    F --> G["Schedule Matrix<br/>Slot × Node"]
+    F --> H["EMANE TDMA XML"]
+    H --> I["16 EMANE NEMs<br/>TDMA Radio Model"]
+    I --> J["Virtual Interfaces<br/>emane1 – emane16"]
+    J --> K["Packet-Level Validation<br/>5/5 Received • 0% Loss"]
+
+    style A fill:#eaf3ff,stroke:#4a90e2,stroke-width:2px
+    style B fill:#eef8ff,stroke:#4a90e2,stroke-width:2px
+    style C fill:#fff4df,stroke:#e5a33a,stroke-width:2px
+    style D fill:#eefaf2,stroke:#3eaf68,stroke-width:2px
+    style E fill:#f5edff,stroke:#9568cf,stroke-width:2px
+    style F fill:#ffeaea,stroke:#d45c5c,stroke-width:2px
+    style G fill:#f7f7f7,stroke:#777,stroke-width:2px
+    style H fill:#f0f0ff,stroke:#6969c8,stroke-width:2px
+    style I fill:#fff4df,stroke:#e5a33a,stroke-width:2px
+    style J fill:#eef8ff,stroke:#4a90e2,stroke-width:2px
+    style K fill:#eefaf2,stroke:#3eaf68,stroke-width:2px
+```
 
 ## Overview
 
@@ -118,7 +142,6 @@ Radio-Sheduler/
 ├── requirements.txt
 ├── TESTING.md
 ├── README.md
-├── tdma-architecture.svg
 └── emane/
     ├── README.md
     ├── platform-16nem.xml
