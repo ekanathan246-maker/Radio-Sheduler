@@ -1,139 +1,310 @@
-TDMA Schedule Planner
+# TDMA Schedule Planner & Optimizer
 
-This project assigns recurring transmission slots to a set of wireless radios. It builds a communication graph from node coordinates, derives the two-hop interference constraints, and uses graph coloring to produce a schedule. The same Node-to-Slot assignment can be exported as an EMANE TDMA schedule.
+A Python-based TDMA scheduler for wireless radio networks. The project converts radio coordinates into a communication graph, derives **distance-2 interference constraints**, assigns conflict-free transmission slots, and exports the resulting schedule for **EMANE** emulation.
 
-Scheduling model
+<p align="center">
+  <img src="tdma-architecture.svg" alt="TDMA System Architecture" width="100%">
+</p>
 
-Each input radio is a graph node. Radios at or within the configured range (500 m by default) are connected by an edge. The scheduler then creates a conflict graph: radios connected directly, or connected through one common neighbor, must use different slots.
+## Overview
 
-The scheduler compares First-Fit, Largest-Degree-First, and DSATUR coloring. It compacts each result by moving radios into earlier slots when that move preserves the conflict constraints, then selects the valid assignment with the fewest slots. Radios without a conflict can share a slot.
+The scheduler follows this pipeline:
 
-Coloring is a hard optimization problem, so these strategies are heuristics. The largest clique in the conflict graph gives a lower bound on the number of slots. When the schedule uses that many slots, the result is optimal for the modeled topology. A positive gap means a better schedule may exist.
+```text
+Node Coordinates
+      │
+      ▼
+Communication Graph
+      │
+      ▼
+Distance-2 Conflict Graph
+      │
+      ▼
+Graph Coloring
+      │
+      ▼
+Spatial Reuse / Slot Compaction
+      │
+      ▼
+TDMA Schedule + Slot Matrix
+      │
+      ▼
+EMANE TDMA XML
+      │
+      ▼
+16-NEM EMANE Network
+      │
+      ▼
+Packet-Level Validation
+```
 
-Architecture
+For the supplied **16-node 4×4 topology**, using a **500 m communication range** and **300 m node spacing**, the implementation produces a **9-slot conflict-free schedule**.
 
-flowchart LR
-    relay["Other relay"]
-    redis[("Redis")]
-    api["Go / Gin API"]
-    mongo[("MongoDB")]
-    react["React client"]
+## Scheduling Model
 
-    relay -->|"idempotent LSN snapshot + publish"| redis
-    redis -->|"Pub/Sub"| api
-    api -->|"versioned WebSocket"| react
-    react -->|"REST + secure cookies"| api
-    api -->|"transaction: vote + outbox"| mongo
-    api -->|"claim pending event"| redis
-    api -->|"reconnect state"| react
+Each radio is represented as a node in a communication graph.
 
-Requirements
+- Two radios within the configured radio range are connected.
+- The scheduler builds a **distance-2 conflict graph**.
+- Directly connected nodes must use different slots.
+- Nodes that share a common neighbor must also use different slots.
+- Nodes outside the modeled distance-2 conflict relationship may reuse a slot.
+- Spatial reuse reduces the TDMA frame length while preserving the conflict constraint.
 
-Python 3.9 or newer
+The implementation uses graph-coloring heuristics and then compacts slot assignments without introducing conflicts.
 
-Packages listed in requirements.txt
+For the supplied topology, the conflict graph has a **9-node clique**, establishing a lower bound of 9 slots. The generated schedule also uses 9 slots, so the result is optimal for that modeled topology.
 
-EMANE is needed only to load and run the generated schedule in an emulator
+## Example Topology
 
-Install
+| Parameter | Value |
+| --- | --- |
+| Radios | 16 |
+| Layout | 4 × 4 grid |
+| Node spacing | 300 m |
+| Radio range | 500 m |
+| Interference model | Distance-2 |
+| Frame length | 9 slots |
+| Spatial reuse | Enabled |
 
+## Final Node-to-Slot Assignment
+
+| Node | Slot |
+| --- | ---: |
+| Node_01 | 8 |
+| Node_02 | 7 |
+| Node_03 | 4 |
+| Node_04 | 8 |
+| Node_05 | 6 |
+| Node_06 | 2 |
+| Node_07 | 0 |
+| Node_08 | 5 |
+| Node_09 | 5 |
+| Node_10 | 1 |
+| Node_11 | 3 |
+| Node_12 | 6 |
+| Node_13 | 8 |
+| Node_14 | 7 |
+| Node_15 | 4 |
+| Node_16 | 8 |
+
+### Slot Occupancy
+
+| Slot | Assigned radios |
+| ---: | --- |
+| 0 | Node_07 |
+| 1 | Node_10 |
+| 2 | Node_06 |
+| 3 | Node_11 |
+| 4 | Node_03, Node_15 |
+| 5 | Node_08, Node_09 |
+| 6 | Node_05, Node_12 |
+| 7 | Node_02, Node_14 |
+| 8 | Node_01, Node_04, Node_13, Node_16 |
+
+Nodes sharing a slot are spatially reusable under the modeled distance-2 conflict graph.
+
+## Project Structure
+
+```text
+Radio-Sheduler/
+├── tdma_scheduler.py
+├── run_from_file.py
+├── sample_input.json
+├── hidden_terminal_test.json
+├── spatial_reuse_test.json
+├── test_scheduler.py
+├── validation_tests.py
+├── requirements.txt
+├── TESTING.md
+├── README.md
+├── tdma-architecture.svg
+└── emane/
+    ├── README.md
+    ├── platform-16nem.xml
+    ├── tdma-schedule.xml
+    ├── tdmaradiomodel.xml
+    ├── transvirtual.xml
+    └── nem/
+        ├── tdmanem-1.xml
+        ├── tdmanem-2.xml
+        ├── ...
+        └── tdmanem-16.xml
+```
+
+## Requirements
+
+- Python 3.9+
+- NetworkX
+- Dependencies listed in `requirements.txt`
+- EMANE 1.5.3 for the emulation stage
+
+## Installation
+
+Create a virtual environment:
+
+```bash
 python -m venv .venv
+```
 
-Activate the environment, then install the dependencies:
+Activate it:
 
-# Linux or macOS
+```bash
+# Linux / macOS
 source .venv/bin/activate
 
 # Windows PowerShell
-# .venv\Scripts\Activate.ps1
+.venv\\Scripts\\Activate.ps1
+```
 
+Install the project dependencies:
+
+```bash
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
+```
 
-Generate a schedule
+## Run the Scheduler
 
-Run the supplied 16-radio example from the repository root:
+Run the file-based example:
 
-python run_demo.py --input sample_input.json --range 500 --output-dir outputs
+```bash
+python run_from_file.py sample_input.json
+```
 
-The report includes the node assignments, slot matrix, strategy comparison, conflict counts, validation results, clique lower bound, and optimality gap. The command writes these files to outputs/:
+Or run the scheduler directly with JSON coordinates:
 
-File
-
-Contents
-
-result.json
-
-Coordinates, graph edges, assignments, matrix, and summary metrics
-
-metrics.json
-
-Conflict, validation, slot reuse, and lower-bound metrics
-
-schedule_matrix.csv
-
-Binary Slot-by-Node matrix
-
-benchmark.csv
-
-Coloring strategy slot counts and runtimes for the input topology
-
-tdma-schedule.xml
-
-EMANE schedule generated from the selected assignment
-
-communication_topology.svg
-
-Direct radio links
-
-distance2_conflict_graph.svg
-
-Direct and two-hop conflicts
-
-slot_colored_topology.svg
-
-Topology with nodes colored by assigned slot
-
-slot_occupancy.svg
-
-Number of radios assigned to each slot
-
-algorithm_comparison.svg
-
-Slot count and runtime by coloring strategy
-
-The CLI can also take coordinates directly:
-
+```bash
 python tdma_scheduler.py --coordinates '{"Node_01":[0,0],"Node_02":[300,0]}' --range 500
+```
 
-To compare the algorithms over sparse, dense, linear, hidden-terminal, isolated, grid, and seeded random topologies, including 25- and 50-radio cases, run:
+The scheduler:
 
-python benchmark_scenarios.py --output outputs/scenario_benchmark.csv
+1. Parses the node coordinates.
+2. Builds the communication graph.
+3. Builds the distance-2 conflict graph.
+4. Performs graph coloring.
+5. Applies spatial reuse.
+6. Generates the Slot × Node matrix.
+7. Verifies that no conflict pair shares a slot.
 
-EMANE
+## Testing
 
-Node names ending in a number map to that EMANE NEM id (Node_01 maps to NEM 1). The XML generator rejects names without a numeric suffix and duplicate NEM ids. It also reads the generated XML back and checks that each NEM has the same slot as the Python assignment.
+Run the unit tests:
 
-With the EMANE platform and radio model configured, deliver the generated schedule using:
+```bash
+python test_scheduler.py
+```
 
-emaneevent-tdmaschedule outputs/tdma-schedule.xml -i <event-device>
+Run the validation scenarios:
 
-Inspect the TDMA scheduler accept and reject counters with emanesh. The configuration files and notes are in emane/. For the schedule format and EMANE-specific requirements, see the EMANE TDMA Radio Model guide.
+```bash
+python validation_tests.py
+```
 
-Scope
+The completed validation covered:
 
-Connectivity is modeled as a symmetric distance threshold. This project does not calculate propagation loss, traffic demand, link asymmetry, or per-slot payload capacity. The schedule guarantees the stated distance-2 graph constraint; it does not model every source of radio interference.
+- 16-node topology loading
+- 500 m communication range
+- Distance-2 conflict detection
+- Conflict-free slot assignments
+- One-slot-per-node validation
+- Schedule matrix validation
+- Direct interference
+- Hidden-terminal behavior
+- Spatial reuse
+- Isolated nodes
+- 16-node grid scheduling
+- Slot-efficiency checks
+- Communication-graph construction
 
-Source files
+### Recorded Results
 
-tdma_scheduler.py contains the graph construction, coloring, validation, metrics, and exporters.
+| Test group | Result |
+| --- | --- |
+| Unit tests | **7/7 passed** |
+| Validation tests | **8/8 passed** |
+| 16-node schedule | **9 slots** |
+| Conflict verification | **Passed** |
 
-run_demo.py runs the optimizer and writes its report and artifacts.
+## EMANE Integration
 
-benchmark_scenarios.py runs the multi-topology comparison.
+The generated Node-to-Slot mapping is exported to an EMANE TDMA schedule.
 
-sample_input.json contains the 4-by-4 example topology.
+The integration contains:
 
-test_scheduler.py and validation_tests.py contain the existing checks.
+- EMANE platform configuration
+- 16 NEM-specific configurations
+- TDMA radio model configuration
+- Virtual transport configuration
+- TDMA schedule XML
 
-emane/ contains the sample platform, NEM, transport, and radio-model configuration.
+Node IDs map directly to EMANE NEM IDs:
+
+```text
+Node_01 → NEM 1
+Node_02 → NEM 2
+...
+Node_16 → NEM 16
+```
+
+The EMANE configuration is contained in the [`emane/`](emane/) directory.
+
+A schedule can be delivered through the EMANE TDMA event utility:
+
+```bash
+emaneevent-tdmaschedule emane/tdma-schedule.xml -i <event-device>
+```
+
+The TDMA scheduler counters can be inspected with `emanesh`.
+
+## EMANE Verification
+
+The 16-NEM integration was exercised under **Ubuntu 24.04 on WSL2**.
+
+Verified:
+
+- All 16 NEMs started successfully.
+- The TDMA schedule was accepted.
+- The Node-to-Slot mapping matched the EMANE schedule.
+- Virtual interfaces `emane1` through `emane16` were created.
+- Packet-level testing completed with **5 packets transmitted, 5 received, and 0% loss**.
+
+### Environment Limitation
+
+WSL2 reported limitations related to real-time thread priority. Therefore, the EMANE result demonstrates **functional TDMA schedule integration and packet delivery**, not real-time hardware timing fidelity.
+
+## Scope and Assumptions
+
+The scheduler uses a symmetric Euclidean distance threshold for connectivity.
+
+It does not model:
+
+- RF propagation loss
+- Link asymmetry
+- Traffic demand
+- Per-slot payload capacity
+- Detailed PHY interference
+- Hardware clock synchronization
+- Real-world RF channel conditions
+
+The schedule guarantees the modeled **distance-2 graph constraint**; it is not intended to be a complete physical-layer interference simulator.
+
+## Technologies
+
+- Python
+- NetworkX
+- Graph coloring / DSATUR
+- JSON
+- XML
+- EMANE
+- Ubuntu / Linux
+- WSL2
+
+## Repository
+
+[GitHub Repository](https://github.com/ekanathan246-maker/Radio-Sheduler)
+
+## License
+
+MIT License. See [`LICENSE`](LICENSE).

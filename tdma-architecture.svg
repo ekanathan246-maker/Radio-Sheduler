@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="head" x1="0" x2="1"><stop offset="0" stop-color="#12345b"/><stop offset="1" stop-color="#0b2340"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="4" stdDeviation="5" flood-opacity=".15"/></filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#19324d"/></marker>
+    <style>
+      .title{font:700 34px Arial,sans-serif;fill:#fff}.subtitle{font:400 17px Arial,sans-serif;fill:#d9e7f5}
+      .h{font:700 22px Arial,sans-serif;fill:#10243a}.b{font:600 16px Arial,sans-serif;fill:#10243a}.s{font:400 14px Arial,sans-serif;fill:#43566b}
+      .small{font:600 13px Arial,sans-serif;fill:#24384c}.arrow{stroke:#19324d;stroke-width:3;fill:none;marker-end:url(#arrow)}
+      .panel{stroke-width:2;filter:url(#shadow)} .box{stroke-width:1.5}
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#f7fafc"/>
+  <rect x="25" y="20" width="1550" height="100" rx="18" fill="url(#head)"/>
+  <text x="800" y="63" text-anchor="middle" class="title">TDMA System Architecture</text>
+  <text x="800" y="91" text-anchor="middle" class="subtitle">Distance-2 interference-aware scheduling, spatial reuse, and EMANE validation</text>
+
+  <rect x="35" y="145" width="340" height="455" rx="18" fill="#eef7ff" stroke="#4a9be8" class="panel"/>
+  <text x="205" y="180" text-anchor="middle" class="h">1. Network Topology Input</text>
+  <rect x="65" y="205" width="280" height="175" rx="12" fill="#fff" stroke="#a8ccef" class="box"/>
+  <g stroke="#7b9dbd" stroke-width="3">
+    <path d="M100 240 L170 240 L240 240 L310 240 M100 290 L170 290 L240 290 L310 290 M100 340 L170 340 L240 340 L310 340"/>
+    <path d="M100 240 L100 290 L100 340 M170 240 L170 290 L170 340 M240 240 L240 290 L240 340 M310 240 L310 290 L310 340"/>
+  </g>
+  <g fill="#d9ecff" stroke="#3d78a8" stroke-width="2">
+    <circle cx="100" cy="240" r="16"/><circle cx="170" cy="240" r="16"/><circle cx="240" cy="240" r="16"/><circle cx="310" cy="240" r="16"/>
+    <circle cx="100" cy="290" r="16"/><circle cx="170" cy="290" r="16"/><circle cx="240" cy="290" r="16"/><circle cx="310" cy="290" r="16"/>
+    <circle cx="100" cy="340" r="16"/><circle cx="170" cy="340" r="16"/><circle cx="240" cy="340" r="16"/><circle cx="310" cy="340" r="16"/>
+  </g>
+  <text x="205" y="414" text-anchor="middle" class="b">16-radio 4×4 example topology</text>
+  <text x="62" y="458" class="s">• Coordinates loaded from JSON</text>
+  <text x="62" y="486" class="s">• Default radio range: 500 m</text>
+  <text x="62" y="514" class="s">• Euclidean distance determines links</text>
+  <text x="62" y="542" class="s">• Direct adjacency becomes the network graph</text>
+
+  <rect x="420" y="145" width="380" height="455" rx="18" fill="#f0fbf4" stroke="#3eaf68" class="panel"/>
+  <text x="610" y="180" text-anchor="middle" class="h">2. TDMA Scheduler</text>
+  <rect x="450" y="205" width="320" height="88" rx="12" fill="#fff4df" stroke="#e9a33b" class="box"/>
+  <text x="610" y="235" text-anchor="middle" class="b">Distance-2 Conflict Graph</text>
+  <text x="610" y="259" text-anchor="middle" class="s">1-hop + common-neighbor conflicts</text>
+  <path d="M610 294 L610 322" class="arrow"/>
+  <rect x="450" y="325" width="320" height="88" rx="12" fill="#eaf3ff" stroke="#4a9be8" class="box"/>
+  <text x="610" y="355" text-anchor="middle" class="b">Graph Coloring</text>
+  <text x="610" y="379" text-anchor="middle" class="s">DSATUR / heuristic slot assignment</text>
+  <path d="M610 414 L610 442" class="arrow"/>
+  <rect x="450" y="445" width="320" height="70" rx="12" fill="#f5edff" stroke="#9a68d4" class="box"/>
+  <text x="610" y="474" text-anchor="middle" class="b">Spatial Reuse</text>
+  <text x="610" y="496" text-anchor="middle" class="s">Move non-conflicting nodes earlier</text>
+  <path d="M610 516 L610 544" class="arrow"/>
+  <rect x="450" y="547" width="320" height="35" rx="10" fill="#ffe8e8" stroke="#d65a5a" class="box"/>
+  <text x="610" y="571" text-anchor="middle" class="b">9-slot conflict-free schedule</text>
+
+  <path d="M375 370 L418 370" class="arrow"/>
+  <text x="397" y="350" text-anchor="middle" class="small">topology</text>
+
+  <rect x="845" y="145" width="330" height="455" rx="18" fill="#f6f1ff" stroke="#7b5ac8" class="panel"/>
+  <text x="1010" y="180" text-anchor="middle" class="h">3. EMANE Integration</text>
+  <rect x="875" y="205" width="270" height="78" rx="12" fill="#eaf3ff" stroke="#4a9be8" class="box"/>
+  <text x="1010" y="235" text-anchor="middle" class="b">TDMA Schedule XML</text>
+  <text x="1010" y="260" text-anchor="middle" class="s">tdma-schedule.xml</text>
+  <path d="M1010 284 L1010 312" class="arrow"/>
+  <rect x="875" y="315" width="270" height="78" rx="12" fill="#eefaf2" stroke="#3eaf68" class="box"/>
+  <text x="1010" y="345" text-anchor="middle" class="b">16 NEM Configurations</text>
+  <text x="1010" y="370" text-anchor="middle" class="s">tdmanem-1.xml … tdmanem-16.xml</text>
+  <path d="M1010 394 L1010 422" class="arrow"/>
+  <rect x="875" y="425" width="270" height="78" rx="12" fill="#fff4df" stroke="#e9a33b" class="box"/>
+  <text x="1010" y="455" text-anchor="middle" class="b">TDMA Radio Model</text>
+  <text x="1010" y="480" text-anchor="middle" class="s">tdmaradiomodel.xml</text>
+  <path d="M1010 504 L1010 532" class="arrow"/>
+  <rect x="875" y="535" width="270" height="47" rx="10" fill="#ffe8e8" stroke="#d65a5a" class="box"/>
+  <text x="1010" y="564" text-anchor="middle" class="b">Virtual transport</text>
+
+  <path d="M800 370 L843 370" class="arrow"/>
+  <text x="822" y="350" text-anchor="middle" class="small">export</text>
+
+  <rect x="1220" y="145" width="345" height="455" rx="18" fill="#eef7ff" stroke="#4a9be8" class="panel"/>
+  <text x="1392" y="180" text-anchor="middle" class="h">4. EMANE Network</text>
+  <rect x="1250" y="205" width="285" height="205" rx="12" fill="#fff" stroke="#a8ccef" class="box"/>
+  <g stroke="#c19a52" stroke-width="3">
+    <path d="M1290 245 L1360 245 L1430 245 L1500 245 M1290 305 L1360 305 L1430 305 L1500 305 M1290 365 L1360 365 L1430 365 L1500 365"/>
+    <path d="M1290 245 L1290 305 L1290 365 M1360 245 L1360 305 L1360 365 M1430 245 L1430 305 L1430 365 M1500 245 L1500 305 L1500 365"/>
+  </g>
+  <g fill="#fff0c9" stroke="#b27b24" stroke-width="2">
+    <circle cx="1290" cy="245" r="14"/><circle cx="1360" cy="245" r="14"/><circle cx="1430" cy="245" r="14"/><circle cx="1500" cy="245" r="14"/>
+    <circle cx="1290" cy="305" r="14"/><circle cx="1360" cy="305" r="14"/><circle cx="1430" cy="305" r="14"/><circle cx="1500" cy="305" r="14"/>
+    <circle cx="1290" cy="365" r="14"/><circle cx="1360" cy="365" r="14"/><circle cx="1430" cy="365" r="14"/><circle cx="1500" cy="365" r="14"/>
+  </g>
+  <text x="1392" y="440" text-anchor="middle" class="b">16 EMANE NEMs</text>
+  <text x="1248" y="475" class="s">• Assigned TDMA slots applied</text>
+  <text x="1248" y="503" class="s">• Virtual interfaces emane1–emane16</text>
+  <text x="1248" y="531" class="s">• Conflict-free schedule enforced</text>
+  <text x="1248" y="559" class="s">• Packet transmission verified</text>
+
+  <path d="M1175 370 L1218 370" class="arrow"/>
+  <text x="1197" y="350" text-anchor="middle" class="small">deploy</text>
+
+  <rect x="35" y="640" width="1530" height="220" rx="18" fill="#fff" stroke="#b8c7d6" class="panel"/>
+  <text x="800" y="677" text-anchor="middle" class="h">Validation &amp; Testing</text>
+
+  <rect x="65" y="700" width="340" height="125" rx="12" fill="#eefaf2" stroke="#53ad72" class="box"/>
+  <text x="235" y="730" text-anchor="middle" class="b">Python Validation</text>
+  <text x="88" y="758" class="s">✓ Unit tests: 7/7 passed</text>
+  <text x="88" y="783" class="s">✓ Validation tests: 8/8 passed</text>
+  <text x="88" y="808" class="s">✓ Distance-2 conflicts checked</text>
+
+  <rect x="430" y="700" width="340" height="125" rx="12" fill="#f0f6ff" stroke="#5a91d6" class="box"/>
+  <text x="600" y="730" text-anchor="middle" class="b">Schedule Properties</text>
+  <text x="453" y="758" class="s">✓ 16 nodes scheduled</text>
+  <text x="453" y="783" class="s">✓ 9-slot frame</text>
+  <text x="453" y="808" class="s">✓ Spatial reuse preserved</text>
+
+  <rect x="795" y="700" width="340" height="125" rx="12" fill="#fff5e8" stroke="#dfa24b" class="box"/>
+  <text x="965" y="730" text-anchor="middle" class="b">EMANE Integration Test</text>
+  <text x="818" y="758" class="s">✓ 16 NEMs started</text>
+  <text x="818" y="783" class="s">✓ Schedule accepted</text>
+  <text x="818" y="808" class="s">✓ 5/5 packets received, 0% loss</text>
+
+  <rect x="1160" y="700" width="405" height="125" rx="12" fill="#fff0f0" stroke="#d06b6b" class="box"/>
+  <text x="1362" y="730" text-anchor="middle" class="b">Environment Note</text>
+  <text x="1183" y="758" class="s">WSL2 reported real-time thread-priority limits.</text>
+  <text x="1183" y="783" class="s">Integration demonstrates functional scheduling</text>
+  <text x="1183" y="808" class="s">and packet delivery, not hardware timing fidelity.</text>
+</svg>
